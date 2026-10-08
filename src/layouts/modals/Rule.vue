@@ -99,7 +99,7 @@
             <v-col cols="12" sm="6" md="4">
               <v-select
                 v-model="ruleData.method"
-                :items="[{ title: 'Default', value: 'default' },{ title: 'Drop', value: 'drop'}]"
+                :items="[{ title: $t('options.default'), value: 'default' },{ title: $t('options.drop'), value: 'drop'}]"
                 :label="$t('rule.method')"
                 clearable
                 @click:clear="delete ruleData.method"
@@ -141,7 +141,7 @@
               </v-select>
             </v-col>
             <v-col cols="12" sm="6" md="4">
-              <v-text-field v-model="ruleData.server" :label="$t('basic.dns.server')" hide-details></v-text-field>
+              <v-text-field v-model="ruleData.server" :label="$t('dns.server')" hide-details></v-text-field>
             </v-col>
           </v-row>
         </v-card>
@@ -169,6 +169,7 @@
 </template>
 
 <script lang="ts">
+import { i18n } from '@/locales'
 import { logicalRule, rule, actionKeys } from '@/types/rules'
 import RuleOptions from '@/components/Rule.vue'
 export default {
@@ -187,13 +188,13 @@ export default {
         outbound: 'direct',
       },
       actions: [
-        { title: 'Route', value: 'route'},
-        { title: 'Route Options', value: 'route-options'},
-        { title: 'Bypass', value: 'bypass'},
-        { title: 'Reject', value: 'reject'},
-        { title: 'Hijack DNS', value: 'hijack-dns'},
-        { title: 'Sniff', value: 'sniff'},
-        { title: 'Resolve', value: 'resolve'}
+        { title: i18n.global.t('options.route'), value: 'route'},
+        { title: i18n.global.t('options.routeOptions'), value: 'route-options'},
+        { title: i18n.global.t('options.bypass'), value: 'bypass'},
+        { title: i18n.global.t('options.reject'), value: 'reject'},
+        { title: i18n.global.t('options.hijackDns'), value: 'hijack-dns'},
+        { title: i18n.global.t('options.sniff'), value: 'sniff'},
+        { title: i18n.global.t('options.resolve'), value: 'resolve'}
       ],
       sniffers: [
         { title: 'HTTP', value: 'http' },
@@ -208,10 +209,10 @@ export default {
         { title: 'NTP', value: 'ntp' },
       ],
       strategies: [
-        { title: 'Prefer IPv4', value: 'prefer_ipv4' },
-        { title: 'Prefer IPv6', value: 'prefer_ipv6' },
-        { title: 'IPv4 Only', value: 'ipv4_only' },
-        { title: 'IPv6 Only', value: 'ipv6_only' },
+        { title: i18n.global.t('options.preferIpv4'), value: 'prefer_ipv4' },
+        { title: i18n.global.t('options.preferIpv6'), value: 'prefer_ipv6' },
+        { title: i18n.global.t('options.ipv4Only'), value: 'ipv4_only' },
+        { title: i18n.global.t('options.ipv6Only'), value: 'ipv6_only' },
       ]
     }
   },

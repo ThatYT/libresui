@@ -6,7 +6,7 @@
       </v-col>
       <v-col cols="12" sm="6" md="4">
         <v-text-field
-          label="Alter ID"
+          :label="$t('ui.alterId')"
           hide-details
           type="number"
           min=0

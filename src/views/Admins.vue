@@ -105,7 +105,7 @@ const loadData = async () => {
 }
 
 const dateFormatted = (dt: number): string => {
-  const locale = i18n.global.locale.value.replace('zh', 'zh-')
+  const locale = i18n.global.locale.value === 'zhHans' ? 'zh-CN' : 'en'
   const date = new Date(dt)
   return date.toLocaleString(locale)
 }

@@ -196,7 +196,7 @@
               </v-col>
               <v-col cols="12">
                 <v-text-field
-                  label="Short IDs"
+                  :label="$t('ui.shortIds')"
                   hide-details
                   append-icon="mdi-refresh"
                   @click:append="randomSID"
@@ -205,7 +205,7 @@
               </v-col>
               <v-col cols="12" sm="6" md="4" v-if="optionTime">
                 <v-text-field
-                label="Max Time Diference"
+                :label="$t('ui.maxTimeDifference')"
                 type="number"
                 min="1"
                 :suffix="$t('date.m')"
@@ -237,7 +237,7 @@
             <v-col cols="12" sm="6" md="4">
               <v-select
                 hide-details
-                label="Fingerprint"
+                :label="$t('ui.fingerprint')"
                 :items="fingerprints"
                 v-model="outTls.utls.fingerprint">
               </v-select>
@@ -279,7 +279,7 @@
                   </template>
                   <template v-else>
                     <v-list-item>
-                      <v-switch v-model="optionTime" color="primary" label="Max Time Difference" hide-details></v-switch>
+                      <v-switch v-model="optionTime" color="primary" :label="$t('ui.maxTimeDifference')" hide-details></v-switch>
                     </v-list-item>
                   </template>
                 </v-list>
@@ -369,8 +369,8 @@ export default {
         { title: "QQ", value: "qq" },
         { title: "Apple IOS", value: "ios" },
         { title: "Android", value: "android" },
-        { title: "Random", value: "random" },
-        { title: "Randomized", value: "randomized" },
+        { title: i18n.global.t('options.random'), value: "random" },
+        { title: i18n.global.t('options.randomized'), value: "randomized" },
       ]
     }
   },
@@ -454,7 +454,7 @@ export default {
 
         } else {
           push.error({
-            message: i18n.global.t('error') + ": " + msg.obj
+            message: i18n.global.t('failed') + ": " + msg.obj
           })
         }
       }
@@ -476,7 +476,7 @@ export default {
         })
       } else {
         push.error({
-          message: i18n.global.t('error') + ": " + msg.obj
+          message: i18n.global.t('failed') + ": " + msg.obj
         })
       }
     },

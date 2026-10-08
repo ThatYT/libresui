@@ -48,7 +48,7 @@
       </template>
       <v-col cols="12" sm="6" md="4" v-if="type == inTypes.Hysteria">
         <v-text-field
-        label="Recv window"
+        :label="$t('ui.recvWindow')"
         hide-details
         type="number"
         min="0"
@@ -59,7 +59,7 @@
         <v-col cols="12" sm="6" md="4">
           <v-select
             hide-details
-            label="UDP Relay Mode"
+            :label="$t('ui.udpRelayMode')"
             :items="['native', 'quic']"
             clearable
             @click:clear="delete inData.out_json.udp_relay_mode"
@@ -67,7 +67,7 @@
           </v-select>
         </v-col>
         <v-col cols="12" sm="6" md="4">
-          <v-switch color="primary" label="UDP Over Stream" v-model="inData.out_json.udp_over_stream" hide-details></v-switch>
+          <v-switch color="primary" :label="$t('ui.udpOverStream')" v-model="inData.out_json.udp_over_stream" hide-details></v-switch>
         </v-col>
       </template>
     </v-row>

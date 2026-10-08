@@ -134,7 +134,7 @@
                 <v-col>
                   <v-text-field
                     v-if="clientConfig[key].password != undefined"
-                    label="Password"
+                    :label="$t('ui.password')"
                     v-model="clientConfig[key].password"
                     hide-details>
                   </v-text-field>
@@ -146,13 +146,13 @@
                   </v-text-field>
                   <v-text-field
                     v-if="key == 'vless'"
-                    label="Flow"
+                    :label="$t('ui.flow')"
                     v-model="clientConfig[key].flow"
                     hide-details>
                   </v-text-field>
                   <v-text-field
                     v-if="key == 'hysteria'"
-                    label="Auth"
+                    :label="$t('ui.auth')"
                     v-model="clientConfig[key].auth_str"
                     hide-details>
                   </v-text-field>
@@ -352,7 +352,7 @@ export default {
       const ts = this.client.nextReset?? 0
       if (ts == 0) return '-'
       const date = new Date(ts*1000)
-      return date.toLocaleString(locale)
+      return date.toLocaleString(locale.value)
     },
     percent() :number { return this.client.volume>0 ? Math.round((this.client.up + this.client.down) *100 / this.client.volume) : 0 },
     percentColor() :string { return (this.client.up+this.client.down) >= this.client.volume ? 'error' : this.percent>90 ? 'warning' : 'success' },

@@ -118,7 +118,7 @@
             v-model="platformProxy"
             hide-details
             color="primary"
-            label="Platform HTTP proxy"
+            :label="$t('ui.platformHttpProxy')"
           ></v-switch>
         </v-col>
       </v-row>
@@ -142,7 +142,7 @@
               <v-switch v-model="enableInb" color="primary" :label="$t('objects.inbound')" hide-details></v-switch>
             </v-list-item>
             <v-list-item>
-              <v-switch v-model="enableExp" color="primary" label="Experimental" hide-details></v-switch>
+              <v-switch v-model="enableExp" color="primary" :label="$t('ui.experimental')" hide-details></v-switch>
             </v-list-item>
           </v-list>
         </v-card>

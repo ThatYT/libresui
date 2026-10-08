@@ -9,11 +9,12 @@ import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/styles/main.css'
 
 import colors from 'vuetify/util/colors'
-import { fa, en, vi, zhHans, zhHant, ru } from 'vuetify/locale'
+import { en, zhHans } from 'vuetify/locale'
 
 // Composables
 import { createVuetify } from 'vuetify'
-import { savedSkin } from './skins'
+import { savedTheme } from './theme'
+import { savedLocale } from '@/locales'
 
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 export default createVuetify({
@@ -33,7 +34,7 @@ export default createVuetify({
     },
   },
   theme: {
-    defaultTheme: savedSkin().base,
+    defaultTheme: savedTheme(),
     themes: {
       light: {
         colors: {
@@ -43,15 +44,15 @@ export default createVuetify({
       },
       dark: {
         colors: {
-          primary: colors.blue.darken4,
+          primary: colors.blue.lighten2,
           error: colors.red.accent3,
         },
       },
     },
   },
   locale: {
-    locale: localStorage.getItem("locale") ?? 'en',
+    locale: savedLocale,
     fallback: 'en',
-    messages: { en, fa, vi, zhHans, zhHant, ru },
+    messages: { en, zhHans },
   },
 })

@@ -45,15 +45,13 @@
 </template>
 
 <script lang="ts">
-import { useTheme } from 'vuetify'
 
 export default {
   props: ['visible', 'data', 'title'],
   emits: ['close', 'save'],
   data() {
     return {
-      content: this.$props.data,
-      theme: useTheme()
+      content: this.$props.data
     }
   },
   computed: {
@@ -90,7 +88,7 @@ export default {
 .code-editor {
   direction: ltr !important;
   display: flex;
-  border: 1px solid v-bind('theme.current.colors["outline"]');
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
   border-radius: 4px;
   overflow: hidden;
   font-size: 14px; /* Consistent font size */
@@ -98,7 +96,7 @@ export default {
 
 .line-numbers {
   width: 40px;
-  background: v-bind('theme.current.colors["surface"]');
+  background: rgb(var(--v-theme-surface));
   text-align: right;
   padding: 12px 8px 12px 4px; /* Match textarea padding */
   line-height: 1.5; /* Match textarea line height */

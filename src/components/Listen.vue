@@ -32,19 +32,19 @@
     </v-row>
     <v-row v-if="optionTCP">
       <v-col cols="12" sm="6" md="4">
-        <v-switch v-model="data.tcp_fast_open" color="primary" label="TCP Fast Open" hide-details></v-switch>
+        <v-switch v-model="data.tcp_fast_open" color="primary" :label="$t('ui.tcpFastOpen')" hide-details></v-switch>
       </v-col>
       <v-col cols="12" sm="6" md="4">
-        <v-switch v-model="data.tcp_multi_path" color="primary" label="TCP Multi Path" hide-details></v-switch>
+        <v-switch v-model="data.tcp_multi_path" color="primary" :label="$t('ui.tcpMultiPath')" hide-details></v-switch>
       </v-col>
     </v-row>
     <v-row v-if="optionUDP">
       <v-col cols="12" sm="6" md="4">
-        <v-switch v-model="data.udp_fragment" color="primary" label="UDP Fragment" hide-details></v-switch>
+        <v-switch v-model="data.udp_fragment" color="primary" :label="$t('ui.udpFragment')" hide-details></v-switch>
       </v-col>
       <v-col cols="12" sm="6" md="4">
         <v-text-field
-        label="UDP NAT expiration"
+        :label="$t('ui.udpNatExpiration')"
         hide-details
         type="number"
         min="1"

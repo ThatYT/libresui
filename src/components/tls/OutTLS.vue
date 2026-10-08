@@ -102,7 +102,7 @@
         <v-col cols="12" md="6">
           <v-select
             hide-details
-            label="Fingerprint"
+            :label="$t('ui.fingerprint')"
             :items="fingerprints"
             v-model="tls.utls.fingerprint">
           </v-select>
@@ -118,7 +118,7 @@
         </v-col>
         <v-col cols="12" md="4">
           <v-text-field
-            label="Short ID"
+            :label="$t('ui.shortId')"
             hide-details
             v-model="tls.reality.short_id">
           </v-text-field>
@@ -245,6 +245,7 @@
 </template>
 
 <script lang="ts">
+import { i18n } from '@/locales'
 import { oTls, defaultOutTls } from '@/types/tls'
 export default {
   props: ['outbound'],
@@ -288,8 +289,8 @@ export default {
         { title: "QQ", value: "qq" },
         { title: "Apple IOS", value: "ios" },
         { title: "Android", value: "android" },
-        { title: "Random", value: "random" },
-        { title: "Randomized", value: "randomized" },
+        { title: i18n.global.t('options.random'), value: "random" },
+        { title: i18n.global.t('options.randomized'), value: "randomized" },
       ]
     }
   },

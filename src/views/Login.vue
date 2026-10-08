@@ -18,39 +18,21 @@
                 variant="solo"
                 :items="languages"
                 v-model="$i18n.locale"
+                :label="$t('language')"
                 @update:modelValue="changeLocale">
                 <template v-slot:append>
-                  <v-menu>
-                    <template v-slot:activator="{ props }">
-                      <v-btn icon v-bind="props">
-                        <v-icon>mdi-palette</v-icon>
-                      </v-btn>
-                    </template>
-                    <v-list density="compact">
-                      <v-list-item
-                        v-for="sk in skins"
-                        :key="sk.id"
-                        @click="changeSkin(sk.id)"
-                        :active="currentSkin === sk.id"
-                      >
-                        <template v-slot:prepend>
-                          <span class="skin-swatch" :style="{ backgroundImage: sk.swatch }"></span>
-                        </template>
-                        <v-list-item-title>{{ $t(`skin.${sk.id}`) }}</v-list-item-title>
-                      </v-list-item>
-                    </v-list>
-                  </v-menu>
+                  <ThemeMenu />
                 </template>
               </v-select>
               <div class="text-center mt-3">
                 <a href="https://3yuedaohang.com" target="_blank" rel="noopener noreferrer"
-                  class="text-caption text-decoration-none">🌐 {{ $t('menu.site') }} · 3yuedaohang.com</a>
+                  class="text-caption text-decoration-none text-primary">🌐 {{ $t('menu.site') }} · 3yuedaohang.com</a>
                 <br>
                 <a href="https://www.youtube.com/@zhanzhang3yue" target="_blank" rel="noopener noreferrer"
-                  class="text-caption text-decoration-none">📺 {{ $t('menu.youtube') }} · @zhanzhang3yue</a>
+                  class="text-caption text-decoration-none text-primary">📺 {{ $t('menu.youtube') }} · @zhanzhang3yue</a>
                 <br>
                 <a href="https://3yuedaohang.com/cn2/banwagong" target="_blank" rel="noopener noreferrer"
-                  class="text-caption text-decoration-none">🖥️ {{ $t('menu.vps') }}</a>
+                  class="text-caption text-decoration-none text-primary">🖥️ {{ $t('menu.vps') }}</a>
               </div>
             </v-card-text>
           </v-card>
@@ -62,20 +44,14 @@
 
 <script lang="ts" setup>
 import { ref } from "vue"
-import { useLocale,useTheme } from 'vuetify'
-import { i18n, languages } from '@/locales'
+import { useLocale } from 'vuetify'
+import { i18n, languages, normalizeLocale } from '@/locales'
 import { useRouter } from 'vue-router'
 import HttpUtil from '@/plugins/httputil'
-import { SKINS, savedSkin, applySkinAttr, type SkinId } from '@/plugins/skins'
+import ThemeMenu from '@/components/ThemeMenu.vue'
 
 
-const theme = useTheme()
 const locale = useLocale()
-
-// Same gradient-skin picker as the in-panel app bar, so the login screen shows
-// the chosen skin (default Aurora) and stays in sync with the rest of the UI.
-const skins = SKINS
-const currentSkin = ref<SkinId>(savedSkin().id)
 
 const username = ref('')
 const usernameRules = [
@@ -110,15 +86,10 @@ const login = async () => {
   }
 }
 const changeLocale = (l: any) => {
-  locale.current.value = l ?? 'en'
+  const value = normalizeLocale(l)
+  i18n.global.locale.value = value
+  locale.current.value = value
   localStorage.setItem('locale', locale.current.value)
-}
-const changeSkin = (id: SkinId) => {
-  const sk = SKINS.find((s) => s.id === id)!
-  theme.change(sk.base)
-  applySkinAttr(id)
-  localStorage.setItem('skin', id)
-  currentSkin.value = id
 }
 </script>
 
@@ -126,13 +97,5 @@ const changeSkin = (id: SkinId) => {
 .v-overlay .v-list-item,
 .v-field__input {
   direction: ltr;
-}
-.skin-swatch {
-  display: inline-block;
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  margin-inline-end: 10px;
-  border: 1px solid rgba(128, 128, 128, 0.45);
 }
 </style>

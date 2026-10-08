@@ -69,7 +69,7 @@
           <template v-slot:expanded-row="{ columns, item }">
             <tr>
               <td :colspan="columns.length">
-                <v-card dir="ltr" v-if="item.index>0">Index: {{ item.index }}</v-card>
+                <v-card dir="ltr" v-if="item.index>0">{{ $t('ui.index') }}: {{ item.index }}</v-card>
                 <v-card style="background-color: background" dir="ltr"><pre>{{ item.obj }}</pre></v-card>
               </td>
             </tr>
@@ -123,8 +123,6 @@ export default {
       switch (l) {
         case "zhHans":
           return "zh-cn"
-        case "zhHant":
-          return "zh-tw"
         default:
           return l
       }

@@ -87,14 +87,14 @@
       <v-row v-if="acme.external_account != undefined">
         <v-col cols="12" sm="6" md="4">
           <v-text-field
-          label="Key ID"
+          :label="$t('ui.keyId')"
           hide-details
           v-model="acme.external_account.key_id">
           </v-text-field>
         </v-col>
         <v-col cols="12" sm="6" md="4">
           <v-text-field
-          label="MAC Key"
+          :label="$t('ui.macKey')"
           hide-details
           v-model="acme.external_account.mac_key">
           </v-text-field>

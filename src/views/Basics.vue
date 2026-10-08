@@ -73,10 +73,10 @@
         <Dial :dial="appConfig.ntp" v-if="appConfig.ntp?.enabled" />
       </v-expansion-panel-text>
     </v-expansion-panel>
-    <v-expansion-panel title="Experimental">
+    <v-expansion-panel :title="$t('ui.experimental')">
       <v-expansion-panel-text>
         <v-row>
-          <v-col class="v-card-subtitle">Cache File</v-col>
+          <v-col class="v-card-subtitle">{{ $t('ui.cacheFile') }}</v-col>
         </v-row>
         <v-row>
           <v-col cols="12" sm="6" md="3" lg="2">
@@ -93,7 +93,7 @@
             <v-text-field
               v-model="appConfig.experimental.cache_file.cache_id"
               hide-details
-              label="Cache ID"
+              :label="$t('ui.cacheId')"
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="6" md="3" lg="2" v-if="appConfig.experimental.cache_file">

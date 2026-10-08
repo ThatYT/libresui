@@ -9,6 +9,32 @@ export interface Msg {
   obj: any | null
 }
 
+function errorText(message: string): string {
+  // The backend returns English error strings; localize known UI validation
+  // messages while retaining addresses and other diagnostic details.
+  const separator = message.indexOf(': ')
+  const action = separator >= 0 ? message.slice(0, separator) : ''
+  const detail = separator >= 0 ? message.slice(separator + 2) : message
+  let text = detail
+  if (detail.startsWith('wrong user or password! IP: ')) {
+    text = i18n.global.t('login.invalidCredentials') + ' IP: ' + detail.slice('wrong user or password! IP: '.length)
+  } else {
+    const errors: Record<string, string> = {
+      'wrong password': 'login.invalidPassword',
+      'username can not be empty': 'login.unRules',
+      'password can not be empty': 'login.pwRules',
+      'tls in use': 'ui.tlsInUse',
+      'remote server not found': 'ui.serverNotFound',
+      'invalid token': 'ui.invalidToken',
+    }
+    if (errors[detail]) text = i18n.global.t(errors[detail])
+  }
+  if (action && i18n.global.te('actions.' + action)) {
+    return i18n.global.t('actions.' + action) + ': ' + text
+  }
+  return text === detail ? message : text
+}
+
 function _handleMsg(msg: any): void {
   if (!isMsg(msg)) {
     return
@@ -28,7 +54,7 @@ function _handleMsg(msg: any): void {
     } else {
       push.error({
         title: i18n.global.t('failed'),
-        message: msg.msg
+        message: errorText(msg.msg)
       })
     }
   }
@@ -52,7 +78,7 @@ function _respToMsg(resp: any): Msg {
         return data
     }
   } else {
-    return { success: false, msg: `unknown data: ${data}`, obj: null }
+    return { success: false, msg: i18n.global.t('ui.unknownResponse', { data: String(data) }), obj: null }
   }
 }
 

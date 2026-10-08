@@ -92,7 +92,7 @@
             <v-col cols="12" sm="6" md="4">
               <v-select
                 v-model="ruleData.method"
-                :items="[{ title: 'Default', value: 'default' },{ title: 'Drop', value: 'drop'}]"
+                :items="[{ title: $t('options.default'), value: 'default' },{ title: $t('options.drop'), value: 'drop'}]"
                 :label="$t('rule.method')"
                 clearable
                 @click:clear="delete ruleData.method"
@@ -178,10 +178,10 @@ export default {
         { title: i18n.global.t('dns.rule.action.predefined'), value: 'predefined'},
       ],
       strategies: [
-        { title: 'Prefer IPv4', value: 'prefer_ipv4' },
-        { title: 'Prefer IPv6', value: 'prefer_ipv6' },
-        { title: 'IPv4 Only', value: 'ipv4_only' },
-        { title: 'IPv6 Only', value: 'ipv6_only' },
+        { title: i18n.global.t('options.preferIpv4'), value: 'prefer_ipv4' },
+        { title: i18n.global.t('options.preferIpv6'), value: 'prefer_ipv6' },
+        { title: i18n.global.t('options.ipv4Only'), value: 'ipv4_only' },
+        { title: i18n.global.t('options.ipv6Only'), value: 'ipv6_only' },
       ],
       predefinedRcode: [
         { title: i18n.global.t('dns.rule.action.rcodes.noError'), value: 'NOERROR' },

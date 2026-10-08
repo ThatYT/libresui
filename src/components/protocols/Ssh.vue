@@ -82,7 +82,7 @@
           <v-card>
             <v-list>
               <v-list-item>
-                <v-switch v-model="optionKey" color="primary" label="SSH Key" hide-details></v-switch>
+                <v-switch v-model="optionKey" color="primary" :label="$t('ui.sshKey')" hide-details></v-switch>
               </v-list-item>
               <v-list-item>
                 <v-switch v-model="optionHostKey" color="primary" :label="$t('types.ssh.hostKey')" hide-details></v-switch>

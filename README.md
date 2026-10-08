@@ -1,5 +1,7 @@
 # S-UI-Frontend
-** A frontend for S-UI **
+**The simplified LibreSUI frontend for S-UI.**
+
+Supports English (`en`) and Simplified Chinese (`zhHans`), with Light and Dark modes. Preferences are saved in localStorage; removed language choices fall back to English, and old appearance presets migrate to their light/dark base.
 
 [![License](https://img.shields.io/badge/license-GPL%20V3-blue.svg?longCache=true)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
@@ -55,7 +57,7 @@ pnpm build
 pnpm run build
 ```
 
-### Lints and fixes files
+### Lints files
 
 ```
 # yarn
@@ -70,6 +72,14 @@ pnpm lint
 # bun
 pnpm run lint
 ```
+
+### Regression checks
+
+```sh
+npm test
+```
+
+`npm run build` includes the TypeScript check (`vue-tsc --noEmit`).
 
 ### Customize configuration
 

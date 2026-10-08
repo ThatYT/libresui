@@ -34,7 +34,7 @@
     </v-col>
     <v-col cols="12" sm="6" md="4">
       <v-text-field
-      label="KeepAlive"
+      :label="$t('ui.keepAlive')"
       type="number"
       min="0"
       :suffix="$t('date.s')"

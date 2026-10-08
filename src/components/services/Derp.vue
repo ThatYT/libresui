@@ -14,7 +14,7 @@
         <v-text-field
         :label="$t('pages.home')"
         hide-details
-        placeholder="blank | http[s]://example.com:port/path"
+        :placeholder="$t('ui.verifyUrlHint')"
         v-model="data.home">
         </v-text-field>
       </v-col>

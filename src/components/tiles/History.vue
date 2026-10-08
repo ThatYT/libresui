@@ -3,6 +3,8 @@
 </template>
 
 <script lang="ts">
+import { useTheme } from 'vuetify'
+import { chartTheme } from '@/plugins/chartTheme'
 import { ref } from 'vue'
 import { Line } from 'vue-chartjs'
 import {
@@ -23,8 +25,9 @@ ChartJS.register(
   Title,
   Filler
 )
-ChartJS.defaults.font.family = 'Vazirmatn'
+ChartJS.defaults.font.family = 'Arial, Microsoft YaHei, sans-serif'
 export default {
+  setup() { return { theme: useTheme() } },
   components: {
     Line
   },
@@ -106,19 +109,19 @@ export default {
           this.optionsNet.scales.y.ticks.callback = (label:any, index: number) => {
             return label == 0 ? "0" : HumanReadable.sizeFormat(label,0)
           }
-          return this.optionsNet
+          return chartTheme(this.optionsNet, this.theme.global.current.value.colors)
         case "hp-net":
           this.optionsNet.scales.y.ticks.callback = (label:any, index: number) => {
             return label == 0 ? "0" : HumanReadable.packetFormat(label,0)
           }
-          return this.optionsNet
+          return chartTheme(this.optionsNet, this.theme.global.current.value.colors)
         case "h-dio":
           this.optionsNet.scales.y.ticks.callback = (label:any, index: number) => {
             return label == 0 ? "0" : HumanReadable.sizeFormat(label,0)
           }
-          return this.optionsNet
+          return chartTheme(this.optionsNet, this.theme.global.current.value.colors)
       }
-      return this.options1
+      return chartTheme(this.options1, this.theme.global.current.value.colors)
     }
   },
   methods: {

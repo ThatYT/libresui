@@ -18,7 +18,7 @@
         </v-text-field>
       </v-col>
       <v-col cols="12" sm="6" md="4" v-if="Inbound.wildcard_sni != undefined">
-        <v-select label="Wildcard SNI" :items="['off', 'authed', 'all']" clearable v-model="Inbound.wildcard_sni"></v-select>
+        <v-select :label="$t('ui.wildcardSni')" :items="[{ title: $t('ui.off'), value: 'off' }, { title: $t('ui.authed'), value: 'authed' }, { title: $t('all'), value: 'all' }]" clearable v-model="Inbound.wildcard_sni"></v-select>
       </v-col>
     </v-row>
     <v-row>

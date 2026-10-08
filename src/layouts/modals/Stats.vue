@@ -36,7 +36,9 @@
 </template>
 
 <script lang="ts">
-import { i18n } from '@/locales'
+import { useTheme } from 'vuetify'
+import { chartTheme } from '@/plugins/chartTheme'
+import { i18n, locale } from '@/locales'
 import HttpUtils from '@/plugins/httputil'
 import { HumanReadable } from '@/plugins/utils'
 import {
@@ -62,8 +64,9 @@ ChartJS.register(
   Legend,
   Filler
 )
-ChartJS.defaults.font.family = 'Vazirmatn'
+ChartJS.defaults.font.family = 'Arial, Microsoft YaHei, sans-serif'
 export default {
+  setup() { return { theme: useTheme() } },
   components: {
     Line
   },
@@ -87,7 +90,7 @@ export default {
         { value: 1440, title: i18n.global.n(60) + i18n.global.t('date.d')},
         { value: 2160, title: i18n.global.n(90) + i18n.global.t('date.d')},
       ],
-      options: {
+      chartOptions: {
         responsive: true,
         maintainAspectRatio: false,
         interaction: {
@@ -100,10 +103,6 @@ export default {
         plugins: {
           tooltip: {
             callbacks: {
-              text: (ctx:any) => {
-                const {axis = 'xy', intersect, mode} = ctx.chart.options.interaction
-                return 'Mode: ' + mode + ', axis: ' + axis + ', intersect: ' + intersect
-              },
               footer: (items:any[]) => {
                 return HumanReadable.sizeFormat(items.reduce((acc, c) => acc + c.raw, 0))
               }
@@ -128,13 +127,16 @@ export default {
       usage: ref(<any>{}),
     }
   },
+  computed: {
+    options() { return chartTheme(this.chartOptions, this.theme.global.current.value.colors) },
+  },
   methods: {
     async loadData() {
       this.loading = true
       const data = await HttpUtils.get('api/stats', { resource: this.resource, tag: this.tag, limit: this.limit })
       if (data.success && data.obj) {
         const obj = <any[]>data.obj
-        const l = String(i18n.global.locale) == 'fa' ? "fa-IR" : "en-US"
+        const l = locale.value
         const oneStep = this.limit * 3600 * 1000 / 360 // Each 10 sec
         const now = new Date().getTime()
         const steps = <number[]>[]

@@ -13,7 +13,7 @@
       <v-col cols="12" sm="6" md="4">
         <v-select
           hide-details
-          label="UDP Relay Mode"
+          :label="$t('ui.udpRelayMode')"
           :items="['native', 'quic']"
           clearable
           @click:clear="delete data.udp_relay_mode"
@@ -21,7 +21,7 @@
         </v-select>
       </v-col>
       <v-col cols="12" sm="6" md="4">
-        <v-switch color="primary" label="UDP Over Stream" v-model="data.udp_over_stream" hide-details></v-switch>
+        <v-switch color="primary" :label="$t('ui.udpOverStream')" v-model="data.udp_over_stream" hide-details></v-switch>
       </v-col>
     </v-row>
     <v-row>
@@ -34,7 +34,7 @@
         </v-select>
       </v-col>
       <v-col cols="12" sm="6" md="4">
-        <v-switch color="primary" label="Zero-RTT Handshake" v-model="data.zero_rtt_handshake" hide-details></v-switch>
+        <v-switch color="primary" :label="$t('ui.zeroRttHandshake')" v-model="data.zero_rtt_handshake" hide-details></v-switch>
       </v-col>
     </v-row>
     <v-row>

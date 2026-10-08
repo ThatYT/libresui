@@ -18,7 +18,7 @@
         <v-text-field
           type="number"
           v-model.number="udpTimeout"
-          label="UDP timeout"
+          :label="$t('ui.udpTimeout')"
           min="1"
           :suffix="$t('date.m')"
           hide-details>
@@ -27,24 +27,24 @@
       <v-col cols="12" sm="6" md="4">
         <v-select
           v-model="data.stack"
-          label="Stack"
+          :label="$t('ui.stack')"
           :items="['system','gvisor','mixed']"
           hide-details
         ></v-select>
       </v-col>
       <v-col cols="12" sm="6" md="4">
-        <v-switch v-model="data.endpoint_independent_nat" color="primary" label="Independent NAT" hide-details></v-switch>
+        <v-switch v-model="data.endpoint_independent_nat" color="primary" :label="$t('ui.independentNat')" hide-details></v-switch>
       </v-col>
     </v-row>
     <v-row>
       <v-col cols="12" sm="6" md="4">
-        <v-switch v-model="autoRoute" color="primary" label="Auto Route" hide-details></v-switch>
+        <v-switch v-model="autoRoute" color="primary" :label="$t('ui.autoRoute')" hide-details></v-switch>
       </v-col>
       <v-col cols="12" sm="6" md="4" v-if="autoRoute">
-        <v-switch v-model="data.auto_redirect" color="primary" label="Auto Redirect" hide-details></v-switch>
+        <v-switch v-model="data.auto_redirect" color="primary" :label="$t('ui.autoRedirect')" hide-details></v-switch>
       </v-col>
       <v-col cols="12" sm="6" md="4" v-if="autoRoute">
-        <v-switch v-model="data.strict_route" color="primary" label="Strict Route" hide-details></v-switch>
+        <v-switch v-model="data.strict_route" color="primary" :label="$t('ui.strictRoute')" hide-details></v-switch>
       </v-col>
       <v-col cols="12" sm="6" md="4" v-if="autoRoute && data.auto_redirect">
         <v-switch v-model="data.exclude_mptcp" color="primary" :label="$t('types.tun.excludeMptcp')" hide-details></v-switch>

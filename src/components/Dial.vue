@@ -36,7 +36,7 @@
     <v-row>
       <v-col cols="12" sm="6" md="4" v-if="optionRM">
         <v-text-field
-        label="Linux Routing Mark"
+        :label="$t('ui.linuxRoutingMark')"
         hide-details
         type="number"
         min="0"
@@ -48,10 +48,10 @@
     </v-row>
     <v-row v-if="optionTCP">
       <v-col cols="12" sm="6" md="4">
-        <v-switch v-model="dial.tcp_fast_open" color="primary" label="TCP Fast Open" hide-details></v-switch>
+        <v-switch v-model="dial.tcp_fast_open" color="primary" :label="$t('ui.tcpFastOpen')" hide-details></v-switch>
       </v-col>
       <v-col cols="12" sm="6" md="4">
-        <v-switch v-model="dial.tcp_multi_path" color="primary" label="TCP Multi Path" hide-details></v-switch>
+        <v-switch v-model="dial.tcp_multi_path" color="primary" :label="$t('ui.tcpMultiPath')" hide-details></v-switch>
       </v-col>
     </v-row>
     <v-row v-if="optionTcpKeepAlive">
@@ -67,7 +67,7 @@
     </v-row>
     <v-row>
       <v-col cols="12" sm="6" md="4" v-if="optionUDP">
-        <v-switch v-model="dial.udp_fragment" color="primary" label="UDP Fragment" hide-details></v-switch>
+        <v-switch v-model="dial.udp_fragment" color="primary" :label="$t('ui.udpFragment')" hide-details></v-switch>
       </v-col>
       <v-col cols="12" sm="6" md="4" v-if="optionCT">
         <v-text-field
@@ -113,7 +113,7 @@
               <v-switch v-model="optionBindNoPort" color="primary" :label="$t('dial.bindNoPort')" hide-details></v-switch>
             </v-list-item>
             <v-list-item v-if="mode != 'client'">
-              <v-switch v-model="optionRM" color="primary" label="Routing Mark" hide-details></v-switch>
+              <v-switch v-model="optionRM" color="primary" :label="$t('ui.routingMark')" hide-details></v-switch>
             </v-list-item>
             <v-list-item v-if="mode != 'client'">
               <v-switch v-model="optionRA" color="primary" :label="$t('dial.reuseAddr')" hide-details></v-switch>

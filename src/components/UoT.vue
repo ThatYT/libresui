@@ -1,7 +1,7 @@
 <template>
   <v-select
     hide-details
-    label="UDP over TCP"
+    :label="$t('ui.udpOverTcp')"
     :items="versions"
     v-model="udp_over_tcp">
   </v-select>

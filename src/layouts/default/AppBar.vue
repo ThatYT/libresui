@@ -25,7 +25,7 @@
     </v-menu>
     <v-menu>
       <template v-slot:activator="{ props }">
-        <v-btn icon v-bind="props">
+        <v-btn icon v-bind="props" :aria-label="$t('language')">
           <v-icon>mdi-translate</v-icon>
         </v-btn>
       </template>
@@ -40,37 +40,18 @@
         </v-list-item>
       </v-list>
     </v-menu>
-    <v-menu>
-      <template v-slot:activator="{ props }">
-        <v-btn icon v-bind="props">
-          <v-icon>mdi-palette</v-icon>
-        </v-btn>
-      </template>
-      <v-list density="compact">
-        <v-list-item
-          v-for="sk in skins"
-          :key="sk.id"
-          @click="changeSkin(sk.id)"
-          :active="currentSkin === sk.id"
-        >
-          <template v-slot:prepend>
-            <span class="skin-swatch" :style="{ backgroundImage: sk.swatch }"></span>
-          </template>
-          <v-list-item-title>{{ $t(`skin.${sk.id}`) }}</v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-menu>
+    <ThemeMenu />
   </v-app-bar>
 </template>
 
 <script lang="ts" setup>
-import { useLocale, useTheme } from 'vuetify'
+import { useLocale } from 'vuetify'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { computed, ref } from 'vue'
-import { languages } from '@/locales'
+import { computed } from 'vue'
+import { languages, normalizeLocale } from '@/locales'
 import Data from '@/store/modules/data'
-import { SKINS, savedSkin, applySkinAttr, type SkinId } from '@/plugins/skins'
+import ThemeMenu from '@/components/ThemeMenu.vue'
 
 defineProps(['isMobile'])
 
@@ -87,35 +68,13 @@ const selectServer = (id: string) => Data().setCurrentServer(id)
 const route = useRoute()
 const { locale: i18nLocale } = useI18n()
 const vuetifyLocale = useLocale()
-const theme = useTheme()
 
 const changeLocale = (l: string) => {
+  l = normalizeLocale(l)
   i18nLocale.value = l
   vuetifyLocale.current.value = l
   localStorage.setItem('locale', l)
   window.location.reload()
 }
 const isActiveLocale = (l: string) => i18nLocale.value === l
-// Gradient skins replace the old light/dark/system toggle: each skin carries
-// its own base theme, so picking one sets both the gradient and the contrast.
-const skins = SKINS
-const currentSkin = ref<SkinId>(savedSkin().id)
-const changeSkin = (id: SkinId) => {
-  const sk = SKINS.find((s) => s.id === id)!
-  theme.change(sk.base)
-  applySkinAttr(id)
-  localStorage.setItem('skin', id)
-  currentSkin.value = id
-}
 </script>
-
-<style scoped>
-.skin-swatch {
-  display: inline-block;
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  margin-inline-end: 10px;
-  border: 1px solid rgba(128, 128, 128, 0.45);
-}
-</style>

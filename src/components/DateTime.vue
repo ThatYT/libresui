@@ -11,6 +11,7 @@
     v-model="Input"
     @input="Input=$event"
     :locale="locale"
+    :locale-config="localeConfig"
     element="expiry"
     compact-time
     type="datetime">
@@ -42,10 +43,7 @@
 <script lang="ts">
 import DatePicker from 'vue3-persian-datetime-picker'
 import { i18n, locale } from '@/locales'
-import 'moment/locale/ru'
-import 'moment/locale/vi'
 import 'moment/locale/zh-cn'
-import 'moment/locale/zh-tw'
 
 export default {
   props: ['expiry'],
@@ -58,13 +56,32 @@ export default {
   },
   components: { DatePicker },
   computed: {
+    localeConfig() {
+      const t = i18n.global.t
+      return {
+        [locale.value]: {
+          dir: 'ltr',
+          lang: {
+            label: t('calendar.label'),
+            nextMonth: t('calendar.nextMonth'),
+            prevMonth: t('calendar.prevMonth'),
+            year: t('calendar.year'),
+            month: t('calendar.month'),
+            day: t('calendar.day'),
+            submit: t('submit'),
+            cancel: t('no'),
+            now: t('now'),
+          },
+        },
+      }
+    },
     locale() {
-      return locale
+      return locale.value
     },
     dateFormatted() {
       if (this.expDate == 0) return i18n.global.t('unlimited')
       const date = new Date(this.expDate*1000)
-      return date.toLocaleString(locale)
+      return date.toLocaleString(locale.value)
     },
     expDate() {
       return parseInt(this.expiry?? 0)

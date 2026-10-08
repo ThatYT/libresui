@@ -3,7 +3,7 @@
     <v-card class="rounded-lg" id="qrcode-modal" :loading="loading">
       <v-card-title>
         <v-row>
-          <v-col>QrCode</v-col>
+          <v-col>{{ $t('ui.qrCode') }}</v-col>
           <v-spacer></v-spacer>
           <v-col cols="auto"><v-icon icon="mdi-close-box" @click="$emit('close')" /></v-col>
         </v-row>
@@ -47,7 +47,7 @@
             </v-row>
             <v-row>
               <v-col style="text-align: center;">
-                <v-chip>SING-BOX (scan only)</v-chip><br />
+                <v-chip>{{ $t('ui.singBoxScanOnly') }}</v-chip><br />
                 <QrcodeVue :value="singbox" :size="size" :margin="1" style="border-radius: .8rem; cursor: not-allowed;" />
               </v-col>
             </v-row>
