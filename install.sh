@@ -8,7 +8,7 @@ plain='\033[0m'
 cur_dir=$(pwd)
 
 # Full-auto is the DEFAULT install mode: every command runs start-to-finish with
-# no prompts. On a fresh install it generates random admin credentials + a random
+# only a panel-domain prompt (skip with Enter or set SUI_DOMAIN). On a fresh install it generates random admin credentials + a random
 # panel path + free ports + an API token and opens the firewall, then prints the
 # access info; on an upgrade it keeps existing settings untouched. To get the old
 # interactive flow back, set SUI_AUTO=0 (or n). Examples:
@@ -382,6 +382,39 @@ backup_existing_install() {
     echo "Existing panel backup: $backup_path"
 }
 
+valid_panel_domain() {
+    local domain="$1" label
+    [[ ${#domain} -le 253 && "$domain" == *.* && ! "$domain" =~ ^[0-9.]+$ ]] || return 1
+    local labels
+    IFS='.' read -r -a labels <<< "$domain"
+    [[ "$domain" != *. ]] || return 1
+    for label in "${labels[@]}"; do
+        [[ ${#label} -le 63 && "$label" =~ ^[a-z0-9]([a-z0-9-]*[a-z0-9])?$ ]] || return 1
+    done
+}
+
+configure_domain_prompt() {
+    config_domain="${SUI_DOMAIN:-}"
+    if [[ ${SUI_DOMAIN+x} != x && -t 0 ]]; then
+        echo "Point the domain's DNS A/AAAA record to this server before using it."
+        echo "Setting a domain restricts panel access to that hostname. TLS is configured separately."
+        while true; do
+            read -r -p "Panel domain (e.g. panel.example.com; Enter keeps the existing domain or uses the server IP): " config_domain || return 1
+            config_domain=$(printf '%s' "$config_domain" | tr '[:upper:]' '[:lower:]')
+            [[ -z "$config_domain" ]] && break
+            valid_panel_domain "$config_domain" && break
+            echo "Enter a domain name only, without http(s)://, port or path."
+        done
+    elif [[ ${SUI_DOMAIN+x} != x ]]; then
+        echo "No terminal available; keeping the existing domain. Set SUI_DOMAIN to configure one."
+    fi
+    config_domain=$(printf '%s' "$config_domain" | tr '[:upper:]' '[:lower:]')
+    if [[ -n "$config_domain" ]] && ! valid_panel_domain "$config_domain"; then
+        echo "Invalid SUI_DOMAIN: use a hostname such as panel.example.com." >&2
+        return 1
+    fi
+}
+
 install_s-ui() {
     local last_version="${1:-}" asset staging backup_path=""
     if [[ -z "$last_version" ]]; then
@@ -401,6 +434,12 @@ install_s-ui() {
     if ! tar -xzf "$staging/$asset" -C "$staging" ||
         [[ ! -f "$staging/s-ui/sui" || ! -f "$staging/s-ui/s-ui.sh" || ! -f "$staging/s-ui/s-ui.service" ]]; then
         echo "Invalid release archive; existing installation was not changed." >&2
+        rm -rf "$staging"
+        return 1
+    fi
+    if [[ -n "${config_domain:-}" ]] &&
+        ! "$staging/s-ui/sui" setting -h 2>&1 | grep -q -- '-domain'; then
+        echo "This release does not support domain configuration. Install the latest LibreSUI release." >&2
         rm -rf "$staging"
         return 1
     fi
@@ -428,6 +467,9 @@ install_s-ui() {
         echo "Migration failed; service remains stopped. Backup: $backup_path" >&2
         return 1
     fi
+    if [[ -n "${config_domain:-}" ]]; then
+        /usr/local/s-ui/sui setting -domain "$config_domain" || return 1
+    fi
     open_firewall
     prepare_services
     systemctl enable s-ui || return 1
@@ -443,5 +485,6 @@ install_s-ui() {
 }
 
 echo -e "${green}Executing...${plain}"
+configure_domain_prompt || exit 1
 install_base || exit 1
 install_s-ui "${1:-}"

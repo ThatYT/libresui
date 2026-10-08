@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"io"
+	stdnet "net"
 	"net/http"
 	"strings"
 	"sync"
@@ -214,4 +215,34 @@ func getPanelURI() {
 	if pubIP != "" {
 		fmt.Printf("\nGlobal address:\n%s%s%s\n", Proto, pubIP, PortText+BasePath)
 	}
+}
+
+// Panel domains are hostnames, without scheme, port or path.
+func validPanelDomain(domain string) bool {
+	if len(domain) > 253 || !strings.Contains(domain, ".") || stdnet.ParseIP(domain) != nil {
+		return false
+	}
+	for _, label := range strings.Split(domain, ".") {
+		if len(label) == 0 || len(label) > 63 || label[0] == '-' || label[len(label)-1] == '-' {
+			return false
+		}
+		for _, c := range label {
+			if !(c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '-') {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func setPanelDomain(domain string) error {
+	domain = strings.ToLower(strings.TrimSpace(domain))
+	if !validPanelDomain(domain) {
+		return fmt.Errorf("invalid panel domain: enter a hostname such as panel.example.com")
+	}
+	if err := database.InitDB(config.GetDBPath()); err != nil {
+		return err
+	}
+	settingService := service.SettingService{}
+	return settingService.SetWebDomain(domain)
 }

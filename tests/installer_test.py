@@ -1,5 +1,8 @@
 """Exercise the installer with real archives and isolated paths, without root/network."""
 import os
+import pty
+import select
+import time
 from pathlib import Path
 import subprocess
 import tarfile
@@ -15,7 +18,7 @@ def function(name):
 
 
 class InstallerTest(unittest.TestCase):
-    def run_install(self, existing=False, failure=''):
+    def run_install(self, existing=False, failure='', domain=''):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             for path in ('usr/local', 'usr/bin', 'etc/systemd/system', 'tmp'):
@@ -28,8 +31,10 @@ class InstallerTest(unittest.TestCase):
             bundle.mkdir(parents=True)
             (bundle / 'sui').write_text('''#!/bin/bash
 printf '%s\\n' "$*" >> "$COMMAND_LOG"
+if [[ "$*" == "setting -h" ]]; then echo "-domain string"; fi
 [[ "$1" != migrate || "$FAILURE" != migration ]] || exit 1
 ''')
+            (bundle / 'sui').chmod(0o755)
             (bundle / 's-ui.sh').write_text('#!/bin/bash\nexit 0\n')
             if failure != 'archive':
                 (bundle / 's-ui.service').write_text('[Service]\n')
@@ -37,7 +42,8 @@ printf '%s\\n' "$*" >> "$COMMAND_LOG"
             with tarfile.open(fixture, 'w:gz') as archive:
                 archive.add(bundle, arcname='s-ui')
             functions = '\n'.join(function(name) for name in (
-                'is_auto', 'config_after_install', 'backup_existing_install', 'install_s-ui'))
+                'is_auto', 'config_after_install', 'backup_existing_install', 'valid_panel_domain',
+                'configure_domain_prompt', 'install_s-ui'))
             for prefix in ('/usr/local/', '/usr/bin/', '/etc/', '/var/backups/', '/tmp/'):
                 functions = functions.replace(prefix, str(root) + prefix)
             stubs = '''
@@ -55,8 +61,8 @@ s-ui() { :; }
             if failure == 'backup':
                 stubs += 'backup_existing_install() { return 1; }\n'
             env = dict(os.environ, FAILURE=failure, FIXTURE=str(fixture),
-                       COMMAND_LOG=str(root / 'commands.log'), SUI_AUTO='1')
-            result = subprocess.run(['bash'], input=functions + stubs + '\ninstall_s-ui v1.4.2-libresui.1\n',
+                       COMMAND_LOG=str(root / 'commands.log'), SUI_AUTO='1', SUI_DOMAIN=domain)
+            result = subprocess.run(['bash'], input=functions + stubs + '\nconfigure_domain_prompt && install_s-ui v1.4.2-libresui.2\n',
                                     text=True, env=env, capture_output=True)
             log = (root / 'commands.log').read_text() if (root / 'commands.log').exists() else ''
             db = root / 'usr/local/s-ui/db/s-ui.db'
@@ -97,6 +103,59 @@ s-ui() { :; }
         self.assertIn('systemctl start s-ui', log)
         self.assertNotIn('migrate', log)
         self.assertEqual(db, 'existing users and settings')
+
+    def test_terminal_prompt_retries_invalid_domain(self):
+        master, slave = pty.openpty()
+        env = os.environ.copy()
+        env.pop('SUI_DOMAIN', None)
+        script = function('valid_panel_domain') + function('configure_domain_prompt')
+        script += '\nconfigure_domain_prompt && printf "SAVED=%s\\n" "$config_domain"\n'
+        child = subprocess.Popen(['bash', '-c', script], stdin=slave, stdout=slave,
+                                 stderr=slave, env=env)
+        os.close(slave)
+        os.write(master, b'https://wrong.example\nPanel.Example.COM\n')
+        output = b''
+        deadline = time.monotonic() + 10
+        try:
+            while time.monotonic() < deadline:
+                if select.select([master], [], [], 0.1)[0]:
+                    try:
+                        chunk = os.read(master, 4096)
+                    except OSError:
+                        break
+                    if not chunk:
+                        break
+                    output += chunk
+            self.assertEqual(child.wait(timeout=1), 0)
+        finally:
+            if child.poll() is None:
+                child.kill()
+                child.wait()
+            os.close(master)
+        self.assertIn(b'Enter a domain name only', output)
+        self.assertIn(b'SAVED=panel.example.com', output)
+        self.assertEqual(output.count(b'Panel domain (e.g.'), 2)
+
+    def test_domain_is_normalized_and_saved_before_start(self):
+        code, log, _, _ = self.run_install(domain='Panel.Example.COM')
+        self.assertEqual(code, 0)
+        self.assertIn('setting -domain panel.example.com', log)
+        self.assertLess(log.index('setting -domain'), log.index('systemctl restart'))
+
+    def test_skipped_domain_does_not_change_existing_domain(self):
+        code, log, _, _ = self.run_install(existing=True)
+        self.assertEqual(code, 0)
+        self.assertNotIn('setting -domain', log)
+
+    def test_invalid_domain_aborts_before_download_or_service_stop(self):
+        for domain in ('https://panel.example.com', '127.0.0.1', 'panel.example.com:443',
+                       '-panel.example.com', 'panel..example.com', 'panel.example.com.'):
+            with self.subTest(domain=domain):
+                code, log, db, backups = self.run_install(existing=True, domain=domain)
+                self.assertNotEqual(code, 0)
+                self.assertEqual(log, '')
+                self.assertFalse(backups)
+                self.assertEqual(db, 'existing users and settings')
 
     def test_failed_migration_does_not_start_new_service(self):
         code, log, _, backups = self.run_install(existing=True, failure='migration')

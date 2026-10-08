@@ -28,13 +28,13 @@ Run the same command on a systemd Linux server for a new installation or an in-p
 sudo bash -c 'bash <(curl -fsSL https://raw.githubusercontent.com/ThatYT/libresui/main/install.sh)'
 ```
 
-The installer downloads Linux binaries from **ThatYT/libresui releases**. Fresh installs print randomly generated login credentials and the panel URL. Updates retain the database, users, nodes, subscriptions, login credentials and panel settings, and restart the `s-ui` service. Before an update, the stopped installation and `/etc/s-ui` are backed up to a root-only archive under `/var/backups/libresui/`; the archive path is printed. Keep that backup until the updated panel is verified.
+The installer downloads Linux binaries from **ThatYT/libresui releases**. The installer asks for a panel domain. Enter a hostname such as `panel.example.com` after pointing its DNS A/AAAA record at the server. Press Enter to preserve an existing domain or use the server IP on a fresh install. Setting a domain restricts panel access to that hostname; TLS is configured separately. For unattended installation, set `SUI_DOMAIN` (or `SUI_DOMAIN=""` to skip the prompt). Fresh installs print randomly generated login credentials and the panel URL. Updates retain the database, users, nodes, subscriptions, login credentials and panel settings, and restart the `s-ui` service. Before an update, the stopped installation and `/etc/s-ui` are backed up to a root-only archive under `/var/backups/libresui/`; the archive path is printed. Keep that backup until the updated panel is verified.
 
 Use `s-ui` for the management menu; future updates also use this repository. Docker installations and custom systemd database paths require their own deployment procedure. If another process occupies the existing panel/subscription port, the installer selects a free port and prints the change.
 
 ### 全自动安装(推荐)
 
-一条命令装好,全程无需交互:全自动会自动生成随机管理员账号密码和随机面板路径,装完直接打印访问信息。
+一条命令装好,仅询问面板域名（回车跳过）:全自动会自动生成随机管理员账号密码和随机面板路径,装完直接打印访问信息。
 
 ```sh
 sudo bash -c 'bash <(curl -fsSL https://raw.githubusercontent.com/ThatYT/libresui/main/install.sh)'
