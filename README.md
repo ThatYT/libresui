@@ -85,7 +85,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/Teminuosi/s-ui/main/install.sh
 - 入站 / 出站高级配置;流量路由界面(PROXY Protocol、外部/透明代理、SSL、端口)
 - 客户端流量上限与到期时间;在线客户端、流量统计与系统状态监控
 - 订阅服务(link / json / clash,可加外部订阅);面板与订阅 HTTPS
-- 多语言(英语、波斯语、越南语、简体中文、繁体中文、俄语);明暗主题;API 接口
+- LibreSUI 双语界面(英语、简体中文);浅色/深色主题;API 接口
 
 ---
 
@@ -111,7 +111,7 @@ docker run -itd \
 自行构建镜像:
 
 ```shell
-git clone --recurse-submodules https://github.com/Teminuosi/s-ui
+git clone --recurse-submodules https://github.com/ThatYT/libresui
 cd s-ui
 docker build -t s-ui .
 ```
@@ -149,7 +149,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/Teminuosi/s-ui/main/install.sh
 
 ```shell
 # 克隆(含前端子模块)
-git clone --recurse-submodules https://github.com/Teminuosi/s-ui
+git clone --recurse-submodules https://github.com/ThatYT/libresui
 cd s-ui
 
 # 一键构建并运行(前端 + 后端)
@@ -167,7 +167,7 @@ go build -o sui main.go
 ./sui
 ```
 
-前端代码在独立子模块仓库:[Teminuosi/s-ui-frontend](https://github.com/Teminuosi/s-ui-frontend)
+前端代码保留为 Git 子模块，来自本仓库的 [codex/libresui-frontend 分支](https://github.com/ThatYT/libresui/tree/codex/libresui-frontend)。
 
 </details>
 
