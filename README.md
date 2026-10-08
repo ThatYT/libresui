@@ -20,12 +20,24 @@
 
 ## 快速开始
 
+### Linux: fresh install or update from s-ui
+
+Run the same command on a systemd Linux server for a new installation or an in-place update of an existing standard s-ui installation:
+
+```sh
+sudo bash -c 'bash <(curl -fsSL https://raw.githubusercontent.com/ThatYT/libresui/main/install.sh)'
+```
+
+The installer downloads Linux binaries from **ThatYT/libresui releases**. Fresh installs print randomly generated login credentials and the panel URL. Updates retain the database, users, nodes, subscriptions, login credentials and panel settings, and restart the `s-ui` service. Before an update, the stopped installation and `/etc/s-ui` are backed up to a root-only archive under `/var/backups/libresui/`; the archive path is printed. Keep that backup until the updated panel is verified.
+
+Use `s-ui` for the management menu; future updates also use this repository. Docker installations and custom systemd database paths require their own deployment procedure. If another process occupies the existing panel/subscription port, the installer selects a free port and prints the change.
+
 ### 全自动安装(推荐)
 
 一条命令装好,全程无需交互:全自动会自动生成随机管理员账号密码和随机面板路径,装完直接打印访问信息。
 
 ```sh
-SUI_AUTO=1 bash <(curl -Ls https://raw.githubusercontent.com/Teminuosi/s-ui/main/install.sh)
+sudo bash -c 'bash <(curl -fsSL https://raw.githubusercontent.com/ThatYT/libresui/main/install.sh)'
 ```
 
 ### 交互式安装
@@ -33,14 +45,14 @@ SUI_AUTO=1 bash <(curl -Ls https://raw.githubusercontent.com/Teminuosi/s-ui/main
 想自己一步步设置端口、路径、账号密码,用普通模式:
 
 ```sh
-bash <(curl -Ls https://raw.githubusercontent.com/Teminuosi/s-ui/main/install.sh)
+sudo bash -c 'SUI_AUTO=0 bash <(curl -fsSL https://raw.githubusercontent.com/ThatYT/libresui/main/install.sh)'
 ```
 
 装好后,在服务器上随时输入 `s-ui` 打开管理菜单(启动/停止/重启、改设置、改账号、SSL 证书、BBR 等)。
 
 ### Windows
 
-1. 从 [Releases](https://github.com/Teminuosi/s-ui/releases/latest) 下载最新 Windows 包并解压
+1. 从 [Releases](https://github.com/ThatYT/libresui/releases/latest) 下载最新 Windows 包并解压
 2. 以管理员身份运行 `install-windows.bat`,按向导完成
 
 ---
@@ -132,7 +144,7 @@ s-ui        # 菜单里选「卸载」
 这条**彻底清除**命令不依赖任何已安装的文件：
 
 ```sh
-bash <(curl -Ls https://raw.githubusercontent.com/Teminuosi/s-ui/main/install.sh) purge
+bash <(curl -Ls https://raw.githubusercontent.com/ThatYT/libresui/main/install.sh) purge
 ```
 
 它会清掉：systemd 服务、`/etc/s-ui/`（含数据库）、`/usr/local/s-ui/`、

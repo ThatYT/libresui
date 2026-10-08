@@ -1,4 +1,4 @@
-name: Release S-UI
+name: Release LibreSUI
 
 permissions:
   contents: write
@@ -14,7 +14,9 @@ on:
       - "*"
     paths:
       - '.github/workflows/release.yml'
+      - 'frontend'
       - 'frontend/**'
+      - '.gitmodules'
       - '**.sh'
       - '**.go'
       - 'go.mod'

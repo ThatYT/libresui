@@ -12,8 +12,8 @@ cur_dir=$(pwd)
 # panel path + free ports + an API token and opens the firewall, then prints the
 # access info; on an upgrade it keeps existing settings untouched. To get the old
 # interactive flow back, set SUI_AUTO=0 (or n). Examples:
-#   bash <(curl -Ls https://raw.githubusercontent.com/Teminuosi/s-ui/main/install.sh)            # auto (default)
-#   SUI_AUTO=0 bash <(curl -Ls https://raw.githubusercontent.com/Teminuosi/s-ui/main/install.sh) # interactive
+#   bash <(curl -Ls https://raw.githubusercontent.com/ThatYT/libresui/main/install.sh)            # auto (default)
+#   SUI_AUTO=0 bash <(curl -Ls https://raw.githubusercontent.com/ThatYT/libresui/main/install.sh) # interactive
 SUI_AUTO="${SUI_AUTO:-1}"
 
 is_auto() {
@@ -127,7 +127,7 @@ if [[ "$1" == "purge" || "$1" == "uninstall" || "$1" == "--purge" ]]; then
     rm -f /usr/bin/s-ui
 
     echo -e "${green}Done. s-ui has been completely removed.${plain}"
-    echo -e "Reinstall with: ${green}bash <(curl -Ls https://raw.githubusercontent.com/Teminuosi/s-ui/main/install.sh)${plain}"
+    echo -e "Reinstall with: ${green}bash <(curl -Ls https://raw.githubusercontent.com/ThatYT/libresui/main/install.sh)${plain}"
     exit 0
 fi
 
@@ -182,7 +182,7 @@ install_base() {
 
 config_after_install() {
     echo -e "${yellow}Migration... ${plain}"
-    /usr/local/s-ui/sui migrate
+    /usr/local/s-ui/sui migrate || return 1
 
     # Full-auto mode: no prompts. Fresh install -> random credentials + random
     # panel path; upgrade -> keep existing settings untouched.
@@ -355,7 +355,7 @@ download_release() {
             label="${src#https://}"; label="${label%%/*}"
             echo -e "${yellow}Direct download failed, retrying via mirror: ${label}${plain}"
         fi
-        if wget --no-check-certificate --timeout=30 --tries=2 -O "$out" "$src" \
+        if wget --timeout=30 --tries=2 -O "$out" "$src" \
             && tar -tzf "$out" > /dev/null 2>&1; then
             return 0
         fi
@@ -364,62 +364,84 @@ download_release() {
     return 1
 }
 
+backup_existing_install() {
+    local paths=() item
+    for item in /usr/local/s-ui /etc/s-ui /etc/systemd/system/s-ui.service /usr/bin/s-ui; do
+        [[ ! -e "$item" ]] || paths+=("${item#/}")
+    done
+    [[ ${#paths[@]} -gt 0 ]] || return 0
+    local backup_dir=/var/backups/libresui
+    mkdir -p "$backup_dir" || return 1
+    chmod 700 "$backup_dir" || return 1
+    backup_path=$(mktemp "$backup_dir/s-ui-$(date -u +%Y%m%dT%H%M%SZ)-XXXXXX.tar.gz") || return 1
+    if ! tar -czf "$backup_path" -C / "${paths[@]}"; then
+        rm -f "$backup_path"
+        return 1
+    fi
+    chmod 600 "$backup_path"
+    echo "Existing panel backup: $backup_path"
+}
+
 install_s-ui() {
-    cd /tmp/
-
-    if [ $# == 0 ]; then
-        last_version=$(curl -Ls "https://api.github.com/repos/Teminuosi/s-ui/releases/latest" | grep '"tag_name":' | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
-        # Fall back to the most recent release (covers prerelease-only repos:
-        # /releases/latest skips prereleases, /releases lists everything).
-        if [[ -z "$last_version" ]]; then
-            last_version=$(curl -Ls "https://api.github.com/repos/Teminuosi/s-ui/releases" | grep '"tag_name":' | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
-        fi
-        if [[ ! -n "$last_version" ]]; then
-            echo -e "${red}Failed to fetch s-ui version, it maybe due to Github API restrictions, please try it later${plain}"
-            exit 1
-        fi
-        echo -e "Got s-ui latest version: ${last_version}, beginning the installation..."
-        if ! download_release /tmp/s-ui-linux-$(arch).tar.gz "https://github.com/Teminuosi/s-ui/releases/download/${last_version}/s-ui-linux-$(arch).tar.gz"; then
-            echo -e "${red}Downloading s-ui failed after trying direct + mirrors. Make sure your server can reach Github (or a proxy) and that /tmp has free disk space.${plain}"
-            exit 1
-        fi
-    else
-        last_version=$1
-        url="https://github.com/Teminuosi/s-ui/releases/download/${last_version}/s-ui-linux-$(arch).tar.gz"
-        echo -e "Beginning the install s-ui v$1"
-        if ! download_release /tmp/s-ui-linux-$(arch).tar.gz "${url}"; then
-            echo -e "${red}download s-ui v$1 failed (tried direct + mirrors), please check the version exists${plain}"
-            exit 1
-        fi
+    local last_version="${1:-}" asset staging backup_path=""
+    if [[ -z "$last_version" ]]; then
+        last_version=$(curl -fsSL "https://api.github.com/repos/ThatYT/libresui/releases/latest" | grep '"tag_name":' | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
     fi
-
-    if [[ -e /usr/local/s-ui/ ]]; then
-        systemctl stop s-ui
+    if [[ -z "$last_version" || "$last_version" == *[!a-zA-Z0-9._-]* ]]; then
+        echo "No LibreSUI release found. Check https://github.com/ThatYT/libresui/releases" >&2
+        return 1
     fi
-
-    tar zxvf s-ui-linux-$(arch).tar.gz
-    rm s-ui-linux-$(arch).tar.gz -f
-
-    chmod +x s-ui/sui s-ui/s-ui.sh
-    cp s-ui/s-ui.sh /usr/bin/s-ui
-    cp -rf s-ui /usr/local/
-    cp -f s-ui/*.service /etc/systemd/system/
-    rm -rf s-ui
-
-    config_after_install
+    staging=$(mktemp -d /tmp/libresui-install.XXXXXX) || return 1
+    asset="s-ui-linux-$(arch).tar.gz"
+    echo "Installing LibreSUI $last_version..."
+    if ! download_release "$staging/$asset" "https://github.com/ThatYT/libresui/releases/download/$last_version/$asset"; then
+        rm -rf "$staging"
+        return 1
+    fi
+    if ! tar -xzf "$staging/$asset" -C "$staging" ||
+        [[ ! -f "$staging/s-ui/sui" || ! -f "$staging/s-ui/s-ui.sh" || ! -f "$staging/s-ui/s-ui.service" ]]; then
+        echo "Invalid release archive; existing installation was not changed." >&2
+        rm -rf "$staging"
+        return 1
+    fi
+    if [[ -d /usr/local/s-ui ]]; then
+        systemctl stop s-ui || { rm -rf "$staging"; return 1; }
+    fi
+    if ! backup_existing_install; then
+        echo "Backup failed; existing installation was not changed." >&2
+        systemctl start s-ui >/dev/null 2>&1
+        rm -rf "$staging"
+        return 1
+    fi
+    if ! chmod +x "$staging/s-ui/sui" "$staging/s-ui/s-ui.sh" ||
+        ! mkdir -p /usr/local/s-ui ||
+        ! cp -f "$staging/s-ui/s-ui.sh" /usr/bin/s-ui ||
+        ! cp -f "$staging/s-ui/sui" "$staging/s-ui/s-ui.sh" /usr/local/s-ui/ ||
+        ! cp -f "$staging/s-ui/s-ui.service" /etc/systemd/system/s-ui.service ||
+        ! chmod +x /usr/local/s-ui/sui /usr/local/s-ui/s-ui.sh /usr/bin/s-ui; then
+        echo "Installation failed. Restore the previous installation from $backup_path." >&2
+        rm -rf "$staging"
+        return 1
+    fi
+    rm -rf "$staging"
+    if ! config_after_install; then
+        echo "Migration failed; service remains stopped. Backup: $backup_path" >&2
+        return 1
+    fi
     open_firewall
     prepare_services
-
-    systemctl enable s-ui --now
-
-    echo -e "${green}s-ui ${last_version}${plain} installation finished, it is up and running now..."
-    echo -e "You may access the Panel with following URL(s):${green}"
+    systemctl enable s-ui || return 1
+    systemctl restart s-ui || return 1
+    sleep 3
+    if ! systemctl is-active --quiet s-ui; then
+        echo "Panel failed to start. Check journalctl -u s-ui. Backup: $backup_path" >&2
+        return 1
+    fi
+    echo "LibreSUI $last_version is running."
     /usr/local/s-ui/sui uri
-    echo -e "${plain}"
-    echo -e ""
     s-ui help
 }
 
 echo -e "${green}Executing...${plain}"
-install_base
-install_s-ui $1
+install_base || exit 1
+install_s-ui "${1:-}"
