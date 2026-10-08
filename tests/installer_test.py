@@ -1,6 +1,7 @@
 """Exercise the installer with real archives and isolated paths, without root/network."""
 import os
 import pty
+import re
 import select
 import time
 from pathlib import Path
@@ -44,8 +45,8 @@ if [[ "$*" == "setting -h" ]]; then echo "-domain string"; fi
             functions = '\n'.join(function(name) for name in (
                 'is_auto', 'config_after_install', 'backup_existing_install', 'valid_panel_domain',
                 'configure_domain_prompt', 'install_s-ui'))
-            for prefix in ('/usr/local/', '/usr/bin/', '/etc/', '/var/backups/', '/tmp/'):
-                functions = functions.replace(prefix, str(root) + prefix)
+            functions = re.sub(r'/(?:usr/local/|usr/bin/|etc/|var/backups/|tmp/)',
+                               lambda match: str(root) + match.group(), functions)
             stubs = '''
 arch() { echo amd64; }
 download_release() { [[ "$FAILURE" != download ]] && cp "$FIXTURE" "$1"; }
