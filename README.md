@@ -52,7 +52,7 @@ sudo bash -c 'SUI_AUTO=0 bash <(curl -fsSL https://raw.githubusercontent.com/Tha
 
 ### Windows
 
-1. 从 [Releases](https://github.com/ThatYT/libresui/releases/latest) 下载最新 Windows 包并解压
+1. 从 [Windows Releases](https://github.com/Teminuosi/s-ui/releases/latest) 下载最新 Windows 包并解压
 2. 以管理员身份运行 `install-windows.bat`,按向导完成
 
 ---
